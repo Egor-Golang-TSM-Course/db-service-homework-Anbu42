@@ -1,5 +1,8 @@
 port: 8080
 jwt_secret_key: secret_key_jwt
+log:
+  level: "INFO"
+  format: "JSON"
 components:
   database:
       name: "blog"
@@ -10,3 +13,7 @@ components:
       connectionslimit: 10
       connectiontimeout: "3s"
       connectionlifetime: "5m"
+  cache:
+    host: "127.0.0.1"
+    port: 6379
+    cache_expiration: "10m"

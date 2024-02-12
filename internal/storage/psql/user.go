@@ -12,26 +12,21 @@ import (
 	"golang.org/x/crypto/bcrypt"
 )
 
-// Register регистрирует нового пользователя
-func (pgdb *PostgreSQL) Register(user *models.User) (string, error) {
-	// Генерируем уникальный идентификатор пользователя
+func (pgdb *PostgreSQL) Register(JwtSecretKey string, user *models.User) (string, error) {
 	userID := uuid.New()
 
-	// Хэшируем пароль с использованием bcrypt
 	hashedPassword, err := hashPassword(user.Password)
 	if err != nil {
 		return "", err
 	}
 
-	// Вставляем пользователя в базу данных
 	query := `INSERT INTO users (id, name, login, password, created) VALUES ($1, $2, $3, $4, $5)`
 	_, err = pgdb.pool.Exec(context.Background(), query, userID, user.Name, user.Login, hashedPassword, time.Now())
 	if err != nil {
 		return "", err
 	}
 
-	// Возвращаем токен
-	token, err := generateToken(userID.String())
+	token, err := generateToken(JwtSecretKey, userID.String())
 	if err != nil {
 		return "", err
 	}
@@ -39,9 +34,7 @@ func (pgdb *PostgreSQL) Register(user *models.User) (string, error) {
 	return token, nil
 }
 
-// Login выполняет вход пользователя
-func (pgdb *PostgreSQL) Login(user *models.User) (string, error) {
-	// Получаем данные пользователя из базы данных
+func (pgdb *PostgreSQL) Login(JwtSecretKey string, user *models.User) (string, error) {
 	var userID uuid.UUID
 	var hashedPassword string
 
@@ -56,8 +49,7 @@ func (pgdb *PostgreSQL) Login(user *models.User) (string, error) {
 		return "", errors.New("invalid credentials")
 	}
 
-	// Возвращаем токен
-	token, err := generateToken(userID.String())
+	token, err := generateToken(JwtSecretKey, userID.String())
 	if err != nil {
 		return "", err
 	}
@@ -66,16 +58,15 @@ func (pgdb *PostgreSQL) Login(user *models.User) (string, error) {
 }
 
 // generateToken генерирует JWT токен
-func generateToken(userID string) (string, error) {
+func generateToken(JwtSecretKey string, userID string) (string, error) {
 	claims := jwt.MapClaims{
 		"user_id": userID,
 		"exp":     time.Now().Add(time.Hour * 24).Unix(), // Токен действителен 24 часа
 	}
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	secretKey := []byte("your-secret-key") // Замените на свой секретный ключ
 
-	tokenString, err := token.SignedString(secretKey)
+	tokenString, err := token.SignedString([]byte(JwtSecretKey))
 	if err != nil {
 		return "", err
 	}

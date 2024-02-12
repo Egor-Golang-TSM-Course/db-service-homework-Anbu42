@@ -1,23 +1,25 @@
 package logger
 
 import (
-	"log/slog"
-	"os"
+	"blog/internal/config"
+	"strings"
+
+	"github.com/sirupsen/logrus"
 )
 
-const (
-	JSON = iota + 1
-	TEXT
-)
+func Logger(cfg *config.Config) *logrus.Logger {
 
-func Logger(model int) *slog.Logger {
-	switch model {
-	case JSON:
-		logHandler := slog.NewJSONHandler(os.Stdout, nil)
-		return slog.New(logHandler)
+	logger := logrus.New()
 
-	default:
-		logHandler := slog.NewTextHandler(os.Stdout, nil)
-		return slog.New(logHandler)
+	logLevel, err := logrus.ParseLevel(strings.ToLower(cfg.Log.Level))
+	if err != nil {
+		logger.Fatalf("Invalid log level: %s", cfg.Log.Level)
 	}
+	logger.SetLevel(logLevel)
+
+	if cfg.Log.Format == "json" {
+		logger.SetFormatter(&logrus.JSONFormatter{})
+	}
+
+	return logger
 }

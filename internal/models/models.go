@@ -4,7 +4,6 @@ import (
 	"time"
 )
 
-// User представляет собой структуру данных для пользователя
 type User struct {
 	ID       string    `json:"id"`
 	Name     string    `json:"name"`
@@ -13,7 +12,6 @@ type User struct {
 	Created  time.Time `json:"created"`
 }
 
-// Post представляет собой структуру данных для поста
 type Post struct {
 	ID      int       `json:"id"`
 	Title   string    `json:"title"`
@@ -24,7 +22,6 @@ type Post struct {
 	*Tags
 }
 
-// Comment представляет собой структуру данных для комментария
 type Comment struct {
 	ID      int       `json:"id"`
 	PostID  int       `json:"post_id"`
@@ -33,7 +30,6 @@ type Comment struct {
 	Created time.Time `json:"created"`
 }
 
-// Tag представляет собой структуру данных для тега
 type Tags struct {
 	ID     int    `json:"id"`
 	Name   string `json:"name"`

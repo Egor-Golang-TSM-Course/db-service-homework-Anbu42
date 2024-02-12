@@ -12,8 +12,8 @@ import (
 type PSQL interface {
 	User
 	Post
-	// Comment
-	// Tags
+	Comment
+	Tags
 }
 
 type PostgreSQL struct {
@@ -46,8 +46,8 @@ func NewPostgreSQL(cfg *config.Config) (*PostgreSQL, error) {
 }
 
 type User interface {
-	Register(user *models.User) (string, error)
-	Login(user *models.User) (string, error)
+	Register(JwtSecretKey string, user *models.User) (string, error)
+	Login(JwtSecretKey string, user *models.User) (string, error)
 }
 
 type Post interface {
@@ -58,12 +58,15 @@ type Post interface {
 	DeletePost(id int) error
 }
 
-// type Comment interface {
-// 	CreateComment(comment *models.Comment) (int, error)
-// 	GetCommentsByPostID(postID int) ([]*models.Comment, error)
-// }
+type Comment interface {
+	CreateComment(comment *models.Comment) (int, error)
+	GetCommentsByPostID(postID int) ([]*models.Comment, error)
+	GetCommentByID(id int) (*models.Comment, error)
+	DeleteComment(id int) error
+	UpdateComment(comment *models.Comment) error
+}
 
-// type Tags interface {
-// 	CreateTags(*models.Tag) error
-// 	GetTagsByPostID(postID int) ([]string, error)
-// }
+type Tags interface {
+	CreateTags(*models.Tags) error
+	GetTags() ([]string, error)
+}

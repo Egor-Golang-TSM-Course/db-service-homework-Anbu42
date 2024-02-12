@@ -1,6 +1,8 @@
 package config
 
 import (
+	"time"
+
 	"github.com/go-playground/validator/v10"
 	"github.com/ilyakaznacheev/cleanenv"
 )
@@ -8,7 +10,11 @@ import (
 type Config struct {
 	Port         int    `yaml:"port"`
 	JwtSecretKey string `yaml:"jwt_secret_key"`
-	Components   struct {
+	Log          struct {
+		Level  string `yaml:"level"`
+		Format string `yaml:"format"`
+	} `yaml:"log"`
+	Components struct {
 		Database struct {
 			Name               string `yaml:"name"`
 			Username           string `yaml:"username"`
@@ -19,6 +25,11 @@ type Config struct {
 			ConnectionTimeout  string `yaml:"connectiontimeout"`
 			ConnectionLifetime string `yaml:"connectionlifetime"`
 		} `yaml:"database"`
+		Cache struct {
+			Host            string        `yaml:"host"`
+			Port            string        `yaml:"port"`
+			CacheExpiration time.Duration `yaml:"cache_expiration"`
+		} `yaml:"cache"`
 	} `yaml:"components"`
 }
 
